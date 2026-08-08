@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin — Lucky Draw</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body data-theme="dark">
+<header class="site">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="logo">🎲 Lucky Draw</a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">Dashboard</a>
+      <a href="profile.html" class="btn btn-ghost btn-sm">Profile</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <div class="avatar" data-user-initial>?</div>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+</header>
+
+<div class="page-loading" id="adminLoading"><div class="spinner"></div>Checking admin access…</div>
+
+<div class="admin-shell" id="adminContent" style="display:none;">
+  <nav class="admin-sidebar">
+    <button class="admin-nav-btn active" data-view="overview">📊 Dashboard</button>
+    <button class="admin-nav-btn" data-view="users">👥 Users</button>
+    <button class="admin-nav-btn" data-view="draws">🎟️ Draws</button>
+    <button class="admin-nav-btn" data-view="participants">📋 Participants</button>
+    <button class="admin-nav-btn" data-view="winners">🏆 Winners</button>
+    <button class="admin-nav-btn" data-view="logs">🕒 Activity Logs</button>
+  </nav>
+
+  <main class="admin-main">
+
+    <!-- OVERVIEW -->
+    <div class="admin-view active" id="view-overview">
+      <h1>Admin Overview</h1>
+      <p class="hint">System-wide statistics.</p>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Total Users</div><div class="value" id="ovUsers">0</div></div>
+        <div class="stat-card"><div class="label">Total Draws</div><div class="value" id="ovDraws">0</div></div>
+        <div class="stat-card"><div class="label">Total Participants</div><div class="value" id="ovParticipants">0</div></div>
+        <div class="stat-card"><div class="label">Total Winners</div><div class="value" id="ovWinners">0</div></div>
+        <div class="stat-card"><div class="label">Draws Today</div><div class="value" id="ovDrawsToday">0</div></div>
+        <div class="stat-card"><div class="label">New Users Today</div><div class="value" id="ovUsersToday">0</div></div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="admin-view" id="view-users">
+      <h1>Users</h1>
+      <p class="hint">All registered accounts.</p>
+      <div class="toolbar">
+        <input type="search" id="userSearch" placeholder="Search name or email…" />
+        <select id="userRoleFilter">
+          <option value="">All roles</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" id="exportUsersBtn">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table responsive-cards">
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Draws</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="usersEmpty" style="display:none;">No users found.</div>
+    </div>
+
+    <!-- DRAWS -->
+    <div class="admin-view" id="view-draws">
+      <h1>Draws</h1>
+      <p class="hint">Every draw created across all users.</p>
+      <div class="toolbar">
+        <input type="search" id="drawSearch" placeholder="Search draw name…" />
+        <button class="btn btn-ghost btn-sm" id="exportDrawsBtn">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table responsive-cards">
+          <thead><tr><th>Draw Name</th><th>Owner</th><th>Participants</th><th>Winner</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="adminDrawsBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="adminDrawsEmpty" style="display:none;">No draws found.</div>
+    </div>
+
+    <!-- PARTICIPANTS -->
+    <div class="admin-view" id="view-participants">
+      <h1>Participants</h1>
+      <p class="hint">The most recent 500 participant records.</p>
+      <div class="toolbar">
+        <input type="search" id="participantSearch" placeholder="Search name…" />
+        <button class="btn btn-ghost btn-sm" id="exportParticipantsBtn">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table responsive-cards">
+          <thead><tr><th>Name</th><th>Draw</th><th>Owner</th><th>Winner</th><th>Created</th></tr></thead>
+          <tbody id="participantsBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="participantsEmpty" style="display:none;">No participants found.</div>
+    </div>
+
+    <!-- WINNERS -->
+    <div class="admin-view" id="view-winners">
+      <h1>Winners</h1>
+      <p class="hint">Every winner ever selected, most recent first.</p>
+      <div class="toolbar">
+        <input type="search" id="winnerSearch" placeholder="Search winner…" />
+        <button class="btn btn-ghost btn-sm" id="exportWinnersBtn">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table responsive-cards">
+          <thead><tr><th>Winner</th><th>Draw</th><th>Owner</th><th>Participants</th><th>Date</th></tr></thead>
+          <tbody id="winnersBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="winnersEmpty" style="display:none;">No winners found.</div>
+    </div>
+
+    <!-- ACTIVITY LOGS -->
+    <div class="admin-view" id="view-logs">
+      <h1>Activity Logs</h1>
+      <p class="hint">The most recent 300 events.</p>
+      <div class="table-wrap">
+        <table class="data-table responsive-cards">
+          <thead><tr><th>User</th><th>Action</th><th>Description</th><th>When</th></tr></thead>
+          <tbody id="logsBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="logsEmpty" style="display:none;">No activity yet.</div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Delete confirm modal (draws) -->
+<div class="modal-backdrop" id="adminDeleteModal">
+  <div class="modal">
+    <h3>Delete this draw?</h3>
+    <p>This will permanently delete the draw and all its related records.</p>
+    <div class="row">
+      <button class="btn btn-ghost" id="adminDeleteCancel">Cancel</button>
+      <button class="btn btn-danger" id="adminDeleteConfirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  LD.initThemeToggle(document.getElementById("themeToggle"));
+  document.getElementById("logoutBtn").addEventListener("click", function () { LDAuth.signOut(); });
+</script>
+<script src="js/admin.js"></script>
+</body>
+</html>

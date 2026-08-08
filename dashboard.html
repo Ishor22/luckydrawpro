@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — Lucky Draw</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+<style>
+  .migrate-banner {
+    display: none; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg-elev));
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 20px; font-size: 0.9rem;
+  }
+  .migrate-banner .grow { flex: 1; min-width: 200px; }
+</style>
+</head>
+<body data-theme="dark">
+<header class="site">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="logo">🎲 Lucky Draw</a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">Dashboard</a>
+      <a href="profile.html" class="btn btn-ghost btn-sm">Profile</a>
+      <a href="admin.html" class="btn btn-ghost btn-sm" id="adminLink" style="display:none;">Admin</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <div class="avatar" data-user-initial>?</div>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="page-loading" id="dashLoading"><div class="spinner"></div>Loading your dashboard…</div>
+
+  <div id="dashContent" style="display:none;">
+    <div class="page-head">
+      <div>
+        <h1>Welcome back, <span data-user-name></span></h1>
+        <p>Here's what's happening with your draws.</p>
+      </div>
+      <button class="btn btn-primary btn-lg" id="createDrawBtn">+ Create New Draw</button>
+    </div>
+
+    <div class="migrate-banner" id="migrateBanner">
+      <span>📥</span>
+      <span class="grow">We found names from your old Lucky Draw site saved in this browser. Import them into your account?</span>
+      <button class="btn btn-primary btn-sm" id="migrateBtn">Import Now</button>
+      <button class="btn btn-ghost btn-sm" id="migrateDismiss">Dismiss</button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Total Draws</div><div class="value" id="statDraws">0</div></div>
+      <div class="stat-card"><div class="label">Total Participants</div><div class="value" id="statParticipants">0</div></div>
+      <div class="stat-card"><div class="label">Total Winners</div><div class="value" id="statWinners">0</div></div>
+      <div class="stat-card"><div class="label">Latest Draw</div><div class="value" style="font-size:1.2rem;" id="statLatest">—</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Recent Draws</h2>
+      <p class="hint">All the draws you've created.</p>
+      <div class="table-wrap">
+        <table class="data-table responsive-cards">
+          <thead><tr><th>Draw Name</th><th>Participants</th><th>Winner</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="drawsBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="drawsEmpty" style="display:none;">No draws yet. Tap "Create New Draw" to get started.</div>
+    </div>
+  </div>
+</div>
+
+<footer class="site">© 2026 Lucky Draw. All rights reserved.</footer>
+
+<!-- Create draw modal -->
+<div class="modal-backdrop" id="createModal">
+  <div class="modal">
+    <h3>Create a new draw</h3>
+    <p>Give it a name, like "December Office Lucky Draw."</p>
+    <div class="field">
+      <input type="text" id="drawNameInput" placeholder="Draw name" maxlength="80" />
+      <div class="field-error" id="createError"></div>
+    </div>
+    <div class="row">
+      <button class="btn btn-ghost" id="createCancel">Cancel</button>
+      <button class="btn btn-primary" id="createConfirm">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete draw confirm modal -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal">
+    <h3>Delete this draw?</h3>
+    <p>This will permanently delete the draw, its participants, and its winner history. This cannot be undone.</p>
+    <div class="row">
+      <button class="btn btn-ghost" id="deleteCancel">Cancel</button>
+      <button class="btn btn-danger" id="deleteConfirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  LD.initThemeToggle(document.getElementById("themeToggle"));
+  document.getElementById("logoutBtn").addEventListener("click", function () { LDAuth.signOut(); });
+</script>
+<script src="js/dashboard.js"></script>
+<script>
+  LDAuth.requireAuth().then(function (ctx) {
+    if (ctx && ctx.profile && ctx.profile.role === "admin") {
+      document.getElementById("adminLink").style.display = "inline-flex";
+    }
+  });
+</script>
+</body>
+</html>

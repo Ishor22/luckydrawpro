@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create Account — Lucky Draw</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body data-theme="dark">
+<div class="auth-shell">
+  <div class="auth-card">
+    <a href="index.html" class="auth-logo">🎲 Lucky Draw</a>
+    <div class="auth-title">Create your account</div>
+    <p class="auth-sub">It's free — start running draws in a minute.</p>
+
+    <form id="registerForm" novalidate>
+      <div class="field">
+        <label class="field-label" for="fullName">Full name</label>
+        <input type="text" id="fullName" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label class="field-label" for="email">Email</label>
+        <input type="email" id="email" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label class="field-label" for="password">Password</label>
+        <input type="password" id="password" autocomplete="new-password" required />
+        <div class="hint" style="margin:6px 0 0;">At least 6 characters.</div>
+      </div>
+      <div class="field-error" id="formError" role="alert"></div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBtn">Create Account</button>
+    </form>
+
+    <div class="auth-footer-link">Already have an account? <a href="login.html">Log in</a></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  (function () {
+    LD.applyTheme(localStorage.getItem("luckydraw_theme") || "dark");
+    var form = document.getElementById("registerForm");
+    var errEl = document.getElementById("formError");
+    var btn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      errEl.textContent = "";
+      var fullName = document.getElementById("fullName").value.trim();
+      var email = document.getElementById("email").value.trim();
+      var password = document.getElementById("password").value;
+
+      if (!fullName) { errEl.textContent = "Please enter your name."; return; }
+      if (!email) { errEl.textContent = "Please enter your email."; return; }
+      if (!password || password.length < 6) { errEl.textContent = "Password must be at least 6 characters."; return; }
+
+      LD.setBusy(btn, true, "Creating account…");
+      try {
+        await LDAuth.signUp(fullName, email, password);
+        LD.toast("Account created! Check your email if confirmation is required.", "success");
+        // Supabase may or may not require email confirmation depending on project settings.
+        var session = await LDAuth.getSession();
+        window.location.href = session ? "dashboard.html" : "login.html";
+      } catch (err) {
+        errEl.textContent = LD.friendlyError(err);
+        LD.setBusy(btn, false, "Create Account");
+      }
+    });
+
+    window.sb.auth.getSession().then(function (res) {
+      if (res.data.session) window.location.href = "dashboard.html";
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Log In — Lucky Draw</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body data-theme="dark">
+<div class="auth-shell">
+  <div class="auth-card">
+    <a href="index.html" class="auth-logo">🎲 Lucky Draw</a>
+    <div class="auth-title">Welcome back</div>
+    <p class="auth-sub">Log in to run your draws.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label class="field-label" for="email">Email</label>
+        <input type="email" id="email" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label class="field-label" for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password" required />
+      </div>
+      <div class="auth-alt-link"><a href="forgot-password.html">Forgot password?</a></div>
+      <div class="field-error" id="formError" role="alert"></div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBtn">Log In</button>
+    </form>
+
+    <div class="auth-footer-link">Don't have an account? <a href="register.html">Create one</a></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  (function () {
+    LD.applyTheme(localStorage.getItem("luckydraw_theme") || "dark");
+    var form = document.getElementById("loginForm");
+    var errEl = document.getElementById("formError");
+    var btn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      errEl.textContent = "";
+      var email = document.getElementById("email").value.trim();
+      var password = document.getElementById("password").value;
+      if (!email || !password) { errEl.textContent = "Please fill in both fields."; return; }
+
+      LD.setBusy(btn, true, "Logging in…");
+      try {
+        await LDAuth.signIn(email, password);
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        errEl.textContent = LD.friendlyError(err);
+        LD.setBusy(btn, false, "Log In");
+      }
+    });
+
+    // If already logged in, skip straight to dashboard.
+    window.sb.auth.getSession().then(function (res) {
+      if (res.data.session) window.location.href = "dashboard.html";
+    });
+  })();
+</script>
+</body>
+</html>

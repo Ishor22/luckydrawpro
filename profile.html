@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Profile — Lucky Draw</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body data-theme="dark">
+<header class="site">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="logo">🎲 Lucky Draw</a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">Dashboard</a>
+      <a href="profile.html" class="btn btn-ghost btn-sm">Profile</a>
+      <a href="admin.html" class="btn btn-ghost btn-sm" id="adminLink" style="display:none;">Admin</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <div class="avatar" data-user-initial>?</div>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap-narrow" style="padding-top:34px;">
+  <div class="page-loading" id="profileLoading"><div class="spinner"></div>Loading profile…</div>
+
+  <div id="profileContent" style="display:none;">
+    <h1 style="margin-bottom:22px;">Your Profile</h1>
+
+    <div class="card">
+      <div class="profile-row">
+        <div class="avatar" id="profileAvatarInitial">?</div>
+        <div>
+          <div id="emailDisplay" style="font-weight:700;"></div>
+          <div class="hint" style="margin:2px 0 0;">Joined <span id="joinedDisplay"></span> · <span id="roleDisplay"></span></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="fullNameInput">Full name</label>
+        <input type="text" id="fullNameInput" maxlength="80" />
+      </div>
+      <div class="field-error" id="saveMsg" style="color:var(--success);"></div>
+      <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+    </div>
+
+    <div class="card">
+      <h2>Change Password</h2>
+      <p class="hint">Choose a new password for your account.</p>
+      <div class="field">
+        <label class="field-label" for="newPassword">New password</label>
+        <input type="password" id="newPassword" autocomplete="new-password" />
+      </div>
+      <div class="field-error" id="passwordMsg"></div>
+      <button class="btn btn-ghost" id="updatePasswordBtn">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site">© 2026 Lucky Draw. All rights reserved.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  LD.initThemeToggle(document.getElementById("themeToggle"));
+  document.getElementById("logoutBtn").addEventListener("click", function () { LDAuth.signOut(); });
+</script>
+<script src="js/profile.js"></script>
+<script>
+  LDAuth.requireAuth().then(function (ctx) {
+    if (ctx && ctx.profile && ctx.profile.role === "admin") {
+      document.getElementById("adminLink").style.display = "inline-flex";
+    }
+  });
+</script>
+</body>
+</html>

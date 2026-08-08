@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Draw — Lucky Draw</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body data-theme="dark">
+<canvas id="confettiCanvas"></canvas>
+
+<header class="site">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="logo">🎲 Lucky Draw</a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">Dashboard</a>
+      <a href="profile.html" class="btn btn-ghost btn-sm">Profile</a>
+      <a href="admin.html" class="btn btn-ghost btn-sm" id="adminLink" style="display:none;">Admin</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <div class="avatar" data-user-initial>?</div>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="page-loading" id="drawLoading"><div class="spinner"></div>Loading draw…</div>
+
+  <div id="drawContent" style="display:none;">
+    <div class="page-head">
+      <div><h1 id="drawTitle">Draw</h1><p><a href="dashboard.html" style="color:var(--fg-muted);">← Back to dashboard</a></p></div>
+    </div>
+
+    <div class="card">
+      <h2>Add participants</h2>
+      <p class="hint">Type a name and press Enter, or tap Add Name.</p>
+      <div style="display:flex; gap:10px;">
+        <input type="text" id="nameInput" placeholder="Enter participant name" maxlength="60" style="flex:1;" />
+        <button class="btn btn-primary" id="addBtn">+ Add Name</button>
+      </div>
+      <div class="field-error" id="nameError" role="alert"></div>
+
+      <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:22px;">
+        <h2 style="margin:0;">Participants</h2>
+        <span class="badge" id="countPill">0 people</span>
+      </div>
+      <ul class="tickets" id="ticketList" style="margin-top:14px;"></ul>
+      <div class="empty-state" id="emptyState">No participants yet. Add your first name above.</div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-danger-ghost" id="clearParticipantsBtn">Clear All Participants</button>
+      </div>
+
+      <div class="checkbox-row" style="margin-top:18px; padding-top:18px; border-top:1px solid var(--border);">
+        <input type="checkbox" id="removeWinnerToggle" checked />
+        <label for="removeWinnerToggle">Remove winner after draw (so they can't win twice)</label>
+      </div>
+    </div>
+
+    <div class="card stage">
+      <div class="stage-display" id="stageDisplay">Ready when you are 🎯</div>
+      <div class="winner-card" id="winnerCard">
+        <div class="trophy">🏆</div>
+        <div class="label">Congratulations!</div>
+        <div class="big-name" id="winnerName">—</div>
+      </div>
+      <div class="draw-actions">
+        <button class="btn btn-primary btn-lg" id="drawBtn">🎲 Pick Lucky Winner</button>
+        <button class="btn btn-ghost" id="pickAgainBtn" style="display:none;">Pick Again</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Winner History</h2>
+      <p class="hint">Every winner selected in this draw.</p>
+      <ol id="historyList" style="list-style:none; margin:0; padding:0;"></ol>
+      <div class="empty-state" id="historyEmpty">No winners yet.</div>
+    </div>
+  </div>
+</div>
+
+<footer class="site">© 2026 Lucky Draw. All rights reserved.</footer>
+
+<div class="modal-backdrop" id="clearModal">
+  <div class="modal">
+    <h3>Remove all participants?</h3>
+    <p>Are you sure you want to remove all participants? This cannot be undone.</p>
+    <div class="row">
+      <button class="btn btn-ghost" id="clearCancel">Cancel</button>
+      <button class="btn btn-danger" id="clearConfirm">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  LD.initThemeToggle(document.getElementById("themeToggle"));
+  document.getElementById("logoutBtn").addEventListener("click", function () { LDAuth.signOut(); });
+</script>
+<script src="js/draw.js"></script>
+<script>
+  LDAuth.requireAuth().then(function (ctx) {
+    if (ctx && ctx.profile && ctx.profile.role === "admin") {
+      document.getElementById("adminLink").style.display = "inline-flex";
+    }
+  });
+</script>
+</body>
+</html>
